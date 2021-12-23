@@ -16,14 +16,28 @@ namespace HttpRestRequestConsoleApp
 
             Header header = new Header();
 
+            //List<HeaderParser> headers = new List<HeaderParser> { { new HeaderParser { Key = "test", Value = "1" } } };
+
+            //header.Add(headers);
+
+
+            //headers = new List<HeaderParser> { { new HeaderParser { Key = "test", Value = "2" } } };
+
+            //header.Add(headers);
+
             List<HeaderParser> headers = new List<HeaderParser> { { new HeaderParser { Key = "test", Value = "1" } } };
+            headers.Add(new HeaderParser { Key = "test", Value = "2" });
+            headers.Add(new HeaderParser { Key = "test", Value = "3" });
+
+            header.Set(headers);
+
 
             header.Add(headers);
 
+            header.Add(new HeaderParser() { Key = "test", Value = "4" });
+            header.Add(new HeaderParser() { Key = "test", Value = "5" });
 
-            headers = new List<HeaderParser> { { new HeaderParser { Key = "test", Value = "2" } } };
-
-            header.Add(headers);
+            header.Set("test", "6");
 
             request.header = header;
 
@@ -31,6 +45,7 @@ namespace HttpRestRequestConsoleApp
             {
                 Console.WriteLine($"key : {hp.Key} value : {hp.Value}");
             }
+
 
             //foreach(HeaderParser hc in request.header.)
 

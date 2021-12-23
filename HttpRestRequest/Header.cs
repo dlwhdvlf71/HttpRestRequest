@@ -2,9 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Anony.HttpRestRequest
 {
@@ -23,24 +20,30 @@ namespace Anony.HttpRestRequest
             _headers = new Collection<HeaderParser>();
         }
 
-        public Header Add(ICollection<HeaderParser> headers)
+        #region Set
+
+        public Header Set(HeaderParser headerParser)
         {
             try
             {
-                foreach(HeaderParser headerParser in headers)
+                return Set(headerParser.Key, headerParser.Value);
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public Header Set(string key, string value)
+        {
+            try
+            {
+                if (!_headers.Where(x => x.Key.Equals(key)).Any())
                 {
-                    Console.WriteLine("[BEFOR] " + _headers.Where(x => x.Key.Equals(headerParser.Key)).Count().ToString());
-
-                    _headers.Select(x => x).ToList().RemoveAll(y => y.Key.Equals(headerParser.Key));
-
-                    //_headers.Where(x => x.Key.Equals(headerParser.Key)).Select(y => y).ToList().Clear();
-
-                    Console.WriteLine("[AFTER] " + _headers.Where(x => x.Key.Equals(headerParser.Key)).Count().ToString());
-
-                    _headers.Add(headerParser);
+                    throw new NullReferenceException();
                 }
 
-             
+                _headers.Where(x => x.Key.Equals(key)).FirstOrDefault().Value = value;
 
                 return this;
             }
@@ -49,6 +52,29 @@ namespace Anony.HttpRestRequest
                 throw;
             }
         }
+
+        public Header Set(ICollection<HeaderParser> headers)
+        {
+            try
+            {
+                _headers.Clear();
+
+                foreach (HeaderParser headerParser in headers)
+                {
+                    _headers.Add(headerParser);
+                }
+
+                return this;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        #endregion
+
+        #region Get
 
         public ICollection<HeaderParser> GetHeaderList()
         {
@@ -62,6 +88,74 @@ namespace Anony.HttpRestRequest
             }
         }
 
+        public string Get(string key)
+        {
+            try
+            {
+                if (!_headers.Any())
+                {
+                    return string.Empty;
+                }
 
+                if (!_headers.Where(x => x.Key.Equals(key)).Any())
+                {
+                    return string.Empty;
+                }
+
+                return _headers.Where(x => x.Key.Equals(key)).FirstOrDefault().Value;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        #endregion
+
+        #region Add
+
+        public Header Add(ICollection<HeaderParser> headers)
+        {
+            try
+            {
+                foreach (HeaderParser headerParser in headers)
+                {
+                    Add(headerParser);
+                }
+
+                return this;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public Header Add(HeaderParser headerParser)
+        {
+            try
+            {
+                if (_headers.Any())
+                {
+                    foreach (HeaderParser hp in _headers.ToList())
+                    {
+                        if (hp.Key.Equals(headerParser.Key))
+                        {
+                            _headers.Remove(hp);
+                        }
+                    }
+                }
+
+                _headers.Add(headerParser);
+
+                return this;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        #endregion
     }
 }
