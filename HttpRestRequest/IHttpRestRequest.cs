@@ -8,7 +8,6 @@ namespace Anony.HttpRestRequest
 {
     interface IHttpRestRequest
     {
-        void HttpRequest(string url);
 
     }
 }

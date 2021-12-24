@@ -15,7 +15,9 @@ namespace Anony.HttpRestRequest
 
         private string _baseUrl { get; set; }
 
-        public string Encoding { get; set; } = "UTF-8";
+        public Encoding RequestEncoding { get; set; } = Encoding.UTF8;
+
+        public Encoding ResponseEncoding { get; set; } = Encoding.UTF8;
 
         public int TimeOut { get; set; } = 20000;
 
@@ -34,32 +36,58 @@ namespace Anony.HttpRestRequest
             }
         }
 
-        public void Create(HttpMethod method, string pathAndQuery, string data)
+        public void Execute(HttpMethod method, string pathAndQuery, string data)
         {
             try
             {
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(string.Join(string.Empty, this.BaseUrl, pathAndQuery));
+                #region Validation Check
+
+                if(header.Count <= 0)
+                {
+                    throw new Exception("header 설정이 안되어 있습니다");
+                }
+
+                #endregion
+
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(string.Concat(this.BaseUrl, pathAndQuery));
 
                 //request.Headers = this.header;
 
-                
+                request.Timeout = TimeOut;
                 request.Method = method.ToString();
 
-                
+                if (!string.IsNullOrEmpty(data))
+                {
+                    request.ContentLength = data.Length;
 
-                //Console.WriteLine(request.ContentType.ToString());
-                //Console.WriteLine(request.Headers.GetValues("Content-Type"));
+                    byte[] sendData = this.RequestEncoding.GetBytes(data);
 
-                //using(HttpWebResponse response = (HttpWebResponse)request.GetResponse())
-                //{
-                //    string responseData = string.Empty;
+                    Stream requestStream = null;
 
-                //    using(StreamReader streamReader = new StreamReader(response.GetResponseStream()))
-                //    {
-                //        responseData = streamReader.ReadToEnd();
-                //    }
+                    using(requestStream = request.GetRequestStream())
+                    {
+                        requestStream.Write(sendData, 0, sendData.Length);
+                        requestStream.Close();
+                    }
+                }
 
-                //}
+                // 응답 호출
+                StreamReader responseStreamReader = null;
+                string returnData = string.Empty;
+
+                using(HttpWebResponse response = (HttpWebResponse)request.GetResponse())
+                {
+                    using(responseStreamReader = new StreamReader(response.GetResponseStream(), this.ResponseEncoding))
+                    {
+                        returnData = responseStreamReader.ReadToEnd();
+                    }
+                }
+
+                HttpRestResponse returnResponse = new HttpRestResponse()
+                {
+
+                };
+
 
 
 
@@ -70,16 +98,6 @@ namespace Anony.HttpRestRequest
             }
         }
 
-        public void Test()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void HttpRequest(string url)
-        {
-
-
-        }
     }
 }
 

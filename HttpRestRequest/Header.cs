@@ -13,6 +13,21 @@ namespace Anony.HttpRestRequest
 
     public class Header
     {
+        public int Count
+        {
+            get
+            {
+                try
+                {
+                    return _headers.Count;
+                }
+                catch (Exception)
+                {
+                    return 0;
+                }
+            }
+        }
+
         private ICollection<HeaderParser> _headers;
 
         public Header()
@@ -40,10 +55,12 @@ namespace Anony.HttpRestRequest
             {
                 if (!_headers.Where(x => x.Key.Equals(key)).Any())
                 {
-                    throw new NullReferenceException();
+                    Add(key, value);
                 }
-
-                _headers.Where(x => x.Key.Equals(key)).FirstOrDefault().Value = value;
+                else
+                {
+                    _headers.Where(x => x.Key.Equals(key)).FirstOrDefault().Value = value;
+                }
 
                 return this;
             }
@@ -124,6 +141,23 @@ namespace Anony.HttpRestRequest
                 }
 
                 return this;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public Header Add(string key, string value)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(key) || string.IsNullOrEmpty(value))
+                {
+                    throw new NullReferenceException();
+                }
+
+                return Add(new HeaderParser { Key = key, Value = value });
             }
             catch (Exception ex)
             {
