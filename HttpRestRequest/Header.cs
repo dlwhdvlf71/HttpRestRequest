@@ -5,6 +5,7 @@ using System.Linq;
 
 namespace Anony.HttpRestRequest
 {
+    [Serializable]
     public class HeaderParser
     {
         public string Key { get; set; }
