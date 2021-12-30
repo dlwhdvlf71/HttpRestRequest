@@ -50,24 +50,109 @@ namespace Anony.HttpRestRequest
             }
         }
 
+        private void SetHeader(ref HttpWebRequest httpWebRequest)
+        {
+            try
+            {
+                httpWebRequest.Headers.Clear();
+
+                if (!string.IsNullOrEmpty(this.header.Accept))
+                {
+                    httpWebRequest.Accept = this.header.Accept;
+                }
+
+                if (!string.IsNullOrEmpty(this.header.Connection))
+                {
+                    httpWebRequest.Connection = this.header.Connection;
+                }
+
+                if (!this.header.ContentLength.Equals(0))
+                {
+                    httpWebRequest.ContentLength = this.header.ContentLength;
+                }
+
+                if (!string.IsNullOrEmpty(this.header.ContentType))
+                {
+                    httpWebRequest.ContentType = this.header.ContentType;
+                }
+
+                DateTime checkDateTime;
+
+                if (this.header.Date != null)
+                {
+                    if (!DateTime.TryParse(this.header.Date.ToString(), out checkDateTime))
+                    {
+                        throw new FormatException();
+                    }
+                    httpWebRequest.Date = checkDateTime;
+                }
+
+                if (!string.IsNullOrEmpty(this.header.Expect))
+                {
+                    httpWebRequest.Expect = this.header.Expect;
+                }
+
+                if (!string.IsNullOrEmpty(this.header.Host))
+                {
+                    httpWebRequest.Host = this.header.Host;
+                }
+
+                if (this.header.IfModifiedSince != null)
+                {
+                    if (DateTime.TryParse(this.header.IfModifiedSince.ToString(), out checkDateTime))
+                    {
+                        throw new FormatException();
+                    }
+
+                    httpWebRequest.IfModifiedSince = checkDateTime;
+                }
+
+                if (!string.IsNullOrEmpty(this.header.Referer))
+                {
+                    httpWebRequest.Referer = this.header.Referer;
+                }
+
+                if (!string.IsNullOrEmpty(this.header.TransferEncoding))
+                {
+                    httpWebRequest.TransferEncoding = this.header.TransferEncoding;
+                }
+
+                if (!string.IsNullOrEmpty(this.header.UserAgent))
+                {
+                    httpWebRequest.UserAgent = this.header.UserAgent;
+                }
+
+                if (this.header.Proxy != null)
+                {
+                    httpWebRequest.Proxy = this.header.Proxy;
+                }
+
+                foreach(KeyValuePair<string, string> pair in this.header.GetList())
+                {
+                    httpWebRequest.Headers.Add(pair.Key, pair.Value);
+                }
+
+                //return this;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("ex : " + ex.Message);
+                throw;
+            }
+        }
+
         public void Execute(HttpMethod method, string pathAndQuery, string data)
         {
             try
             {
                 Console.WriteLine("START");
 
-                #region Validation Check
-
-                if(header.Count <= 0)
-                {
-                    throw new Exception("header 설정이 안되어 있습니다");
-                }
-
-                #endregion
-
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(string.Concat(this.BaseUrl, pathAndQuery));
 
-                this.header.GetHeaderList().ToList().ForEach(x => request.Headers.Add(x.Key, x.Value));
+                this.SetHeader(ref request);
+
+                //request.Header
+                //this.header.GetHeaderList().ToList().ForEach(x => request.Headers.Add(x.Key, x.Value));
 
                 request.Timeout = TimeOut;
                 request.Method = method.ToString();
@@ -95,12 +180,12 @@ namespace Anony.HttpRestRequest
                 //WebResponse response;
                 string returnData = string.Empty;
 
-
-
                 WebResponse response = request.GetResponse();
 
                 HttpWebResponse webResponse = (HttpWebResponse)response;
-               
+
+
+                Console.WriteLine(webResponse.StatusCode.ToString());
 
                 //HttpWebResponse response = request.GetResponse() as HttpWebResponse;
 

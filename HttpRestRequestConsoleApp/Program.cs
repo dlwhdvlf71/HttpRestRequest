@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,12 +23,16 @@ namespace HttpRestRequestConsoleApp
 
             Header header = new Header();
 
-            header.Add("Content-Type", "application/json");
-            header.Add("Accept", "application/json");
+            ////header.Add(HttpRequestHeader.ContentType, "application/json");
+            header.Add("test", "11");
+            header.ContentType = "application/json";
+            ////header.Add("Content-Type", "application/json");
+            ////header.Add("Accept", "application/json");
             
 
             request.header = header;
 
+            //request.header.ContentType = "application/json";
 
             // GET TEST
 

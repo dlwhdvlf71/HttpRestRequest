@@ -1,48 +1,50 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Linq;
+using System.Net;
 
 namespace Anony.HttpRestRequest
 {
-    [Serializable]
-    public class HeaderParser
-    {
-        public string Key { get; set; }
-        public string Value { get; set; }
-    }
+    //[Serializable]
+    //public class HeaderParser
+    //{
+    //    public string Key { get; set; }
+    //    public string Value { get; set; }
+    //}
 
-    public class Header
+    public class Header : WebHeaderCollection
     {
-        public int Count
-        {
-            get
-            {
-                try
-                {
-                    return _headers.Count;
-                }
-                catch (Exception)
-                {
-                    return 0;
-                }
-            }
-        }
-
-        private ICollection<HeaderParser> _headers;
+        public string Accept { get; set; }
+        public string Connection { get; set; }
+        public long ContentLength{ get; set; }
+        public string ContentType { get; set; }
+        public DateTime? Date{ get; set; }
+        public string Expect{ get; set; }
+        public string Host { get; set; }
+        public DateTime? IfModifiedSince{ get; set; }
+        public string Referer { get; set; }
+        public string TransferEncoding{ get; set; }
+        public string UserAgent { get; set; }
+        public WebProxy Proxy { get; set; }
 
         public Header()
         {
-            _headers = new Collection<HeaderParser>();
-        }
-
-        #region Set
-
-        public Header Set(HeaderParser headerParser)
-        {
             try
             {
-                return Set(headerParser.Key, headerParser.Value);
+                this.Accept = string.Empty;
+                this.Connection = string.Empty;
+                this.ContentLength = 0;
+                this.ContentType = string.Empty;
+                this.Date = null;
+                this.Expect = string.Empty;
+                this.Host = string.Empty;
+                this.IfModifiedSince = null;
+                this.Referer = string.Empty;
+                this.TransferEncoding = string.Empty;
+                this.UserAgent = string.Empty;
+                this.Proxy = null;
             }
             catch (Exception ex)
             {
@@ -50,147 +52,280 @@ namespace Anony.HttpRestRequest
             }
         }
 
-        public Header Set(string key, string value)
-        {
-            try
-            {
-                if (!_headers.Where(x => x.Key.Equals(key)).Any())
-                {
-                    Add(key, value);
-                }
-                else
-                {
-                    _headers.Where(x => x.Key.Equals(key)).FirstOrDefault().Value = value;
-                }
+        //public Header SetHeader(ref HttpWebRequest httpWebRequest)
+        //{
+        //    try
+        //    {
+        //        httpWebRequest.Headers.Clear();
 
-                return this;
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
-        }
+        //        if (!string.IsNullOrEmpty(this.Accept))
+        //        {
+        //            httpWebRequest.Accept = this.Accept;
+        //        }
 
-        public Header Set(ICollection<HeaderParser> headers)
-        {
-            try
-            {
-                _headers.Clear();
+        //        if (!string.IsNullOrEmpty(this.Connection))
+        //        {
+        //            httpWebRequest.Connection = this.Connection;
+        //        }
 
-                foreach (HeaderParser headerParser in headers)
-                {
-                    _headers.Add(headerParser);
-                }
+        //        if (!ContentLength.Equals(0))
+        //        {
+        //            httpWebRequest.ContentLength = this.ContentLength;
+        //        }
 
-                return this;
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
-        }
+        //        if (!string.IsNullOrEmpty(this.ContentType))
+        //        {
+        //            httpWebRequest.ContentType = this.ContentType;
+        //        }
 
-        #endregion
+        //        DateTime checkDateTime;
 
-        #region Get
+        //        if (this.Date != null)
+        //        {
+        //            if (!DateTime.TryParse(this.Date.ToString(), out checkDateTime))
+        //            {
+        //                throw new FormatException();
+        //            }
+        //            httpWebRequest.Date = checkDateTime;
+        //        }
 
-        public ICollection<HeaderParser> GetHeaderList()
-        {
-            try
-            {
-                return this._headers;
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
-        }
+        //        if (!string.IsNullOrEmpty(this.Expect))
+        //        {
+        //            httpWebRequest.Expect = this.Expect;
+        //        }
 
-        public string Get(string key)
-        {
-            try
-            {
-                if (!_headers.Any())
-                {
-                    return string.Empty;
-                }
+        //        if (!string.IsNullOrEmpty(this.Host))
+        //        {
+        //            httpWebRequest.Host = this.Host;
+        //        }
 
-                if (!_headers.Where(x => x.Key.Equals(key)).Any())
-                {
-                    return string.Empty;
-                }
+        //        if (this.IfModifiedSince != null)
+        //        {
+        //            if(DateTime.TryParse(this.IfModifiedSince.ToString(), out checkDateTime))
+        //            {
+        //                throw new FormatException();    
+        //            }
 
-                return _headers.Where(x => x.Key.Equals(key)).FirstOrDefault().Value;
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
-        }
+        //            httpWebRequest.IfModifiedSince = this.IfModifiedSince;
+        //        }
 
-        #endregion
+        //        if (!string.IsNullOrEmpty(this.Referer))
+        //        {
+        //            httpWebRequest.Referer = this.Referer;
+        //        }
 
-        #region Add
+        //        if (!string.IsNullOrEmpty(this.TransferEncoding))
+        //        {
+        //            httpWebRequest.TransferEncoding = this.TransferEncoding;
+        //        }
 
-        public Header Add(ICollection<HeaderParser> headers)
-        {
-            try
-            {
-                foreach (HeaderParser headerParser in headers)
-                {
-                    Add(headerParser);
-                }
+        //        if (!string.IsNullOrEmpty(this.UserAgent))
+        //        {
+        //            httpWebRequest.UserAgent = this.UserAgent;
+        //        }
 
-                return this;
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
-        }
+        //        if (this.Proxy != null)
+        //        {
+        //            httpWebRequest.Proxy = this.Proxy;
+        //        }
 
-        public Header Add(string key, string value)
-        {
-            try
-            {
-                if (string.IsNullOrEmpty(key) || string.IsNullOrEmpty(value))
-                {
-                    throw new NullReferenceException();
-                }
+        //        return this;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw;
+        //    }
+        //}
 
-                return Add(new HeaderParser { Key = key, Value = value });
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
-        }
+        //public ICollection<KeyValuePair<string, string>> GetList()
+        //{
+        //    try
+        //    {
+        //        return this.AllKeys.Select(x => new KeyValuePair<string, string>(x, this[x])).ToList();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw;
+        //    }
+        //}
 
-        public Header Add(HeaderParser headerParser)
-        {
-            try
-            {
-                if (_headers.Any())
-                {
-                    foreach (HeaderParser hp in _headers.ToList())
-                    {
-                        if (hp.Key.Equals(headerParser.Key))
-                        {
-                            _headers.Remove(hp);
-                        }
-                    }
-                }
+        //public int Count
+        //{
+        //    get
+        //    {
+        //        try
+        //        {
+        //            return _headers.Count;
+        //        }
+        //        catch (Exception)
+        //        {
+        //            return 0;
+        //        }
+        //    }
+        //}
 
-                _headers.Add(headerParser);
+        //private ICollection<HeaderParser> _headers;
 
-                return this;
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
-        }
+        //public Header()
+        //{
+        //    _headers = new Collection<HeaderParser>();
+        //}
 
-        #endregion
+        //#region Set
+
+        //public Header Set(HeaderParser headerParser)
+        //{
+        //    try
+        //    {
+        //        return Set(headerParser.Key, headerParser.Value);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw;
+        //    }
+        //}
+
+        //public Header Set(string key, string value)
+        //{
+        //    try
+        //    {
+        //        if (!_headers.Where(x => x.Key.Equals(key)).Any())
+        //        {
+        //            Add(key, value);
+        //        }
+        //        else
+        //        {
+        //            _headers.Where(x => x.Key.Equals(key)).FirstOrDefault().Value = value;
+        //        }
+
+        //        return this;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw;
+        //    }
+        //}
+
+        //public Header Set(ICollection<HeaderParser> headers)
+        //{
+        //    try
+        //    {
+        //        _headers.Clear();
+
+        //        foreach (HeaderParser headerParser in headers)
+        //        {
+        //            _headers.Add(headerParser);
+        //        }
+
+        //        return this;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw;
+        //    }
+        //}
+
+        //#endregion
+
+        //#region Get
+
+        //public ICollection<HeaderParser> GetHeaderList()
+        //{
+        //    try
+        //    {
+        //        return this._headers;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw;
+        //    }
+        //}
+
+        //public string Get(string key)
+        //{
+        //    try
+        //    {
+        //        if (!_headers.Any())
+        //        {
+        //            return string.Empty;
+        //        }
+
+        //        if (!_headers.Where(x => x.Key.Equals(key)).Any())
+        //        {
+        //            return string.Empty;
+        //        }
+
+        //        return _headers.Where(x => x.Key.Equals(key)).FirstOrDefault().Value;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw;
+        //    }
+        //}
+
+        //#endregion
+
+        //#region Add
+
+        //public Header Add(ICollection<HeaderParser> headers)
+        //{
+        //    try
+        //    {
+        //        foreach (HeaderParser headerParser in headers)
+        //        {
+        //            Add(headerParser);
+        //        }
+
+        //        return this;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw;
+        //    }
+        //}
+
+        //public Header Add(string key, string value)
+        //{
+        //    try
+        //    {
+        //        if (string.IsNullOrEmpty(key) || string.IsNullOrEmpty(value))
+        //        {
+        //            throw new NullReferenceException();
+        //        }
+
+        //        return Add(new HeaderParser { Key = key, Value = value });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw;
+        //    }
+        //}
+
+        //public Header Add(HeaderParser headerParser)
+        //{
+        //    try
+        //    {
+        //        if (_headers.Any())
+        //        {
+        //            foreach (HeaderParser hp in _headers.ToList())
+        //            {
+        //                if (hp.Key.Equals(headerParser.Key))
+        //                {
+        //                    _headers.Remove(hp);
+        //                }
+        //            }
+        //        }
+
+        //        _headers.Add(headerParser);
+
+        //        return this;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw;
+        //    }
+        //}
+
+        //#endregion
     }
 }
