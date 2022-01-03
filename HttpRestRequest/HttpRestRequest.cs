@@ -25,6 +25,8 @@ namespace Anony.HttpRestRequest
 
         public Header header { get; set; }
 
+        private delegate HttpRestResponse ResponseDelegate(HttpMethod method, string pathAndQuery, string data);
+
         public HttpRestRequest()
         {
             try
@@ -141,8 +143,46 @@ namespace Anony.HttpRestRequest
             }
         }
 
-        public void Execute(HttpMethod method, string pathAndQuery, string data)
+        public HttpRestResponse Execute(HttpMethod method, string pathAndQuery, string data)
         {
+            HttpRestResponse httpRestResponse = new HttpRestResponse();
+
+            try
+            {
+                if(method == null)
+                {
+                    httpRestResponse.StatusCode = HttpStatusCode.BadRequest;
+                    httpRestResponse.StatusDescription = "method 는 필수 입니다";
+
+                    return httpRestResponse;
+                }
+
+                switch (method.ToString())
+                {
+                    case "Get":
+
+                        httpRestResponse = GET(method, pathAndQuery, data);
+
+                        break;
+                }
+
+                return httpRestResponse;
+            }
+            catch (Exception ex)
+            {
+                httpRestResponse.StatusCode = HttpStatusCode.BadRequest;
+                httpRestResponse.StatusDescription = ex.Message;
+
+                return httpRestResponse;
+            }
+        }
+
+        private HttpRestResponse GET(HttpMethod method, string pathAndQuery, string data)
+        {
+            HttpRestResponse httpRestResponse = new HttpRestResponse();
+
+            string returnData = string.Empty;
+
             try
             {
                 Console.WriteLine("START");
@@ -150,9 +190,6 @@ namespace Anony.HttpRestRequest
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(string.Concat(this.BaseUrl, pathAndQuery));
 
                 this.SetHeader(ref request);
-
-                //request.Header
-                //this.header.GetHeaderList().ToList().ForEach(x => request.Headers.Add(x.Key, x.Value));
 
                 request.Timeout = TimeOut;
                 request.Method = method.ToString();
@@ -165,70 +202,40 @@ namespace Anony.HttpRestRequest
 
                     //Stream requestStream = null;
 
-                    using(Stream requestStream = request.GetRequestStream())
+                    using (Stream requestStream = request.GetRequestStream())
                     {
                         requestStream.Write(sendData, 0, sendData.Length);
                         requestStream.Close();
                     }
                 }
 
-                Console.WriteLine("Response");
-
-                // 응답 호출
-                //StreamReader responseStreamReader;
-                ////HttpWebResponse response = null;
-                //WebResponse response;
-                string returnData = string.Empty;
-
-                WebResponse response = request.GetResponse();
-
-                HttpWebResponse webResponse = (HttpWebResponse)response;
-
-
-                Console.WriteLine(webResponse.StatusCode.ToString());
-
-                //HttpWebResponse response = request.GetResponse() as HttpWebResponse;
-
-                //Console.WriteLine(response.StatusCode.ToString());
-
-                //using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
-                //{
-                //    Console.WriteLine(response.StatusCode.ToString());
-
-                //    //using (StreamReader responseStreamReader = new StreamReader(response.GetResponseStream()))
-                //    //{
-                //    //    returnData = responseStreamReader.ReadToEnd();
-                //    //}
-                //}
-
-                //using (response = request.GetResponse())
-                //{
-                //    using (responseStreamReader = new StreamReader(response.GetResponseStream()))
-                //    {
-                //        returnData = responseStreamReader.ReadToEnd();
-                //    }
-
-                //}
-
-                Console.WriteLine("returnData : " + returnData);
-
-                HttpRestResponse returnResponse = new HttpRestResponse()
+                using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
                 {
-                    
-                };
+                    httpRestResponse.StatusCode = response.StatusCode;
+                    httpRestResponse.StatusDescription = response.StatusDescription;
+                    httpRestResponse.ContentType = response.ContentType;
+                    httpRestResponse.ContentLength = response.ContentLength;
 
-
-
-
+                    using (StreamReader streamReader = new StreamReader(response.GetResponseStream()))
+                    {
+                        httpRestResponse.Data = streamReader.ReadToEnd();
+                    }
+                }
             }
-            catch(WebException wex)
+            catch (WebException wex)
             {
-                Console.WriteLine(((int)((HttpWebResponse)wex.Response).StatusCode).ToString());
+                httpRestResponse.StatusCode = HttpStatusCode.InternalServerError;
+                httpRestResponse.StatusDescription = wex.Message;
 
-                var pageContent = new StreamReader(wex.Response.GetResponseStream())
-                          .ReadToEnd();
-                
-                Console.WriteLine(pageContent.ToString());
+                if (wex.Response != null)
+                {
+                    HttpWebResponse response = (HttpWebResponse)wex.Response;
+
+                    using (StreamReader streamReader = new StreamReader(response.GetResponseStream()))
+                    {
+                        httpRestResponse.Data = streamReader.ReadToEnd();
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -239,12 +246,12 @@ namespace Anony.HttpRestRequest
                 // Get the line number from the stack frame
                 var line = frame.GetFileLineNumber();
 
-                Console.WriteLine("error line : " + line.ToString());
+                httpRestResponse.StatusCode = HttpStatusCode.InternalServerError;
+                httpRestResponse.StatusDescription = HttpStatusCode.InternalServerError.ToString();
 
-
-
-                throw;
             }
+
+            return httpRestResponse;
         }
 
     }
