@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -143,10 +144,10 @@ namespace Anony.HttpRestRequest
             }
         }
 
-        public HttpRestResponse Execute(HttpMethod method, string pathAndQuery, string data)
+        public HttpRestResponse Execute([Required] HttpMethod method, string pathAndQuery, string data)
         {
             HttpRestResponse httpRestResponse = new HttpRestResponse();
-
+            
             try
             {
                 if(method == null)
@@ -162,7 +163,7 @@ namespace Anony.HttpRestRequest
                     case "Get":
 
                         httpRestResponse = GET(method, pathAndQuery, data);
-
+                        
                         break;
                 }
 
@@ -220,6 +221,8 @@ namespace Anony.HttpRestRequest
                     {
                         httpRestResponse.Data = streamReader.ReadToEnd();
                     }
+
+                    Console.WriteLine(response.StatusCode + httpRestResponse.Data);
                 }
             }
             catch (WebException wex)
