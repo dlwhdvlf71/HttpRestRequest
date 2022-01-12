@@ -131,12 +131,9 @@ namespace Anony.HttpRestRequest
                 {
                     httpWebRequest.Headers.Add(pair.Key, pair.Value);
                 }
-
-                //return this;
             }
             catch (Exception ex)
             {
-                Console.WriteLine("ex : " + ex.Message);
                 throw;
             }
         }
@@ -155,16 +152,7 @@ namespace Anony.HttpRestRequest
                     return httpRestResponse;
                 }
 
-                switch (method.ToString().ToUpper())
-                {
-                    case "GET":
-
-                        Console.WriteLine("START Get");
-
-                        httpRestResponse = GET(method, pathAndQuery, data);
-
-                        break;
-                }
+                httpRestResponse = HttpRequest(method, pathAndQuery, data);
 
                 return httpRestResponse;
             }
@@ -177,7 +165,7 @@ namespace Anony.HttpRestRequest
             }
         }
 
-        private HttpRestResponse GET(HttpMethod method, string pathAndQuery, string data)
+        private HttpRestResponse HttpRequest(HttpMethod method, string pathAndQuery, string data)
         {
             HttpRestResponse httpRestResponse = new HttpRestResponse();
 
@@ -218,8 +206,6 @@ namespace Anony.HttpRestRequest
                     {
                         httpRestResponse.Data = streamReader.ReadToEnd();
                     }
-
-                    Console.WriteLine(response.StatusCode + httpRestResponse.Data);
                 }
             }
             catch (WebException wex)
