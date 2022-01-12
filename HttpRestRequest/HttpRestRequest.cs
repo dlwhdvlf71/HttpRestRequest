@@ -11,10 +11,10 @@ namespace Anony.HttpRestRequest
 {
     public class HttpRestRequest : IHttpRestRequest
     {
+        private string _baseUrl { get; set; }
+
         public string BaseUrl
         { get { return _baseUrl; } set { _baseUrl = value; } }
-
-        private string _baseUrl { get; set; }
 
         public Encoding RequestEncoding { get; set; } = Encoding.UTF8;
 
@@ -23,8 +23,6 @@ namespace Anony.HttpRestRequest
         public int TimeOut { get; set; } = 20000;
 
         public Header header { get; set; }
-
-        private delegate HttpRestResponse ResponseDelegate(HttpMethod method, string pathAndQuery, string data);
 
         public HttpRestRequest()
         {
@@ -138,7 +136,7 @@ namespace Anony.HttpRestRequest
             }
         }
 
-        public HttpRestResponse Execute([Required] HttpMethod method, string pathAndQuery, string data)
+        public HttpRestResponse Execute(HttpMethod method, string pathAndQuery, string data)
         {
             HttpRestResponse httpRestResponse = new HttpRestResponse();
 
