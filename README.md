@@ -5,11 +5,12 @@
 
 > 기본방법
 
-  string baseUri = "http://www.test.co.kr";
-  
-  HttpRestRequest request = new HttpRestRequest(baseUri);
-  
-  string pathAndQuery = "/list";
-  
-  HttpRestResponse response = request.Execute(HttpMethod.Get, pathAndQuery, string.Empty);
-  
+```
+string baseUri = "http://www.test.co.kr";
+
+HttpRestRequest request = new HttpRestRequest(baseUri);
+
+string pathAndQuery = "/list";
+
+HttpRestResponse response = request.Execute(HttpMethod.Get, pathAndQuery, string.Empty);
+```
