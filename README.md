@@ -5,7 +5,7 @@
 
 > 기본방법
 
-```
+```C#
 string baseUri = "http://www.test.co.kr";
 
 HttpRestRequest request = new HttpRestRequest(baseUri);
