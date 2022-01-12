@@ -1,20 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Anony.HttpRestRequest
 {
     public class HttpRestRequest : IHttpRestRequest
     {
-        public string BaseUrl { get { return _baseUrl; } set { _baseUrl = value; } }
+        public string BaseUrl
+        { get { return _baseUrl; } set { _baseUrl = value; } }
 
         private string _baseUrl { get; set; }
 
@@ -32,7 +30,6 @@ namespace Anony.HttpRestRequest
         {
             try
             {
-
             }
             catch (Exception)
             {
@@ -130,7 +127,7 @@ namespace Anony.HttpRestRequest
                     httpWebRequest.Proxy = this.header.Proxy;
                 }
 
-                foreach(KeyValuePair<string, string> pair in this.header.GetList())
+                foreach (KeyValuePair<string, string> pair in this.header.GetList())
                 {
                     httpWebRequest.Headers.Add(pair.Key, pair.Value);
                 }
@@ -147,10 +144,10 @@ namespace Anony.HttpRestRequest
         public HttpRestResponse Execute([Required] HttpMethod method, string pathAndQuery, string data)
         {
             HttpRestResponse httpRestResponse = new HttpRestResponse();
-            
+
             try
             {
-                if(method == null)
+                if (method == null)
                 {
                     httpRestResponse.StatusCode = HttpStatusCode.BadRequest;
                     httpRestResponse.StatusDescription = "method 는 필수 입니다";
@@ -158,12 +155,14 @@ namespace Anony.HttpRestRequest
                     return httpRestResponse;
                 }
 
-                switch (method.ToString())
+                switch (method.ToString().ToUpper())
                 {
-                    case "Get":
+                    case "GET":
+
+                        Console.WriteLine("START Get");
 
                         httpRestResponse = GET(method, pathAndQuery, data);
-                        
+
                         break;
                 }
 
@@ -186,8 +185,6 @@ namespace Anony.HttpRestRequest
 
             try
             {
-                Console.WriteLine("START");
-
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(string.Concat(this.BaseUrl, pathAndQuery));
 
                 this.SetHeader(ref request);
@@ -251,17 +248,9 @@ namespace Anony.HttpRestRequest
 
                 httpRestResponse.StatusCode = HttpStatusCode.InternalServerError;
                 httpRestResponse.StatusDescription = HttpStatusCode.InternalServerError.ToString();
-
             }
 
             return httpRestResponse;
         }
-
     }
 }
-
-
-
-
-
-
