@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Net.Http;
 
 namespace Anony.HttpRestRequest
 {
-    interface IHttpRestRequest
+    internal interface IHttpRestRequest
     {
-
+        HttpRestResponse Execute(HttpMethod method, string pathAndQuery, string data);
     }
 }
